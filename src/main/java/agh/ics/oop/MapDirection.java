@@ -4,8 +4,8 @@ enum MapDirection {
     NORTH,
     SOUTH,
     EAST,
-    WEST,
-    UNKNOWN;
+    WEST;
+//    UNKNOWN;
 
     public String toString(){
         switch(this) {
@@ -28,7 +28,8 @@ enum MapDirection {
             case WEST:
                 return NORTH;
         }
-        return UNKNOWN;
+//        return UNKNOWN;
+        return null;
     }
 
     public MapDirection previous() {
@@ -42,7 +43,8 @@ enum MapDirection {
             case WEST:
                 return SOUTH;
         }
-        return UNKNOWN;
+//        return UNKNOWN;
+        return null;
     }
 
     public Vector2d toUnitVector() {

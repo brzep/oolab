@@ -1,9 +1,39 @@
 package agh.ics.oop;
 
-
 import static java.lang.System.out;
 
 public class World {
+
+// ------------------------------------------------------------------------------------------------
+// propozycja mechanizmu kontrolującego pojawienie się dwóch zwierząt w jednym miejscu
+//
+//    private static boolean[][] availability = {{true, true, true, true, true},    //'true' if certain position is free, 'false' if it's busy
+//                                      {true, true, true, true, true},
+//                                      {true, true, true, true, true},
+//                                      {true, true, true, true, true},
+//                                      {true, true, true, true, true},
+//                                      {true, true, true, true, true}};
+//
+//
+//    public static boolean setOccupation(Vector2d position) {
+//        if (availability[position.x][position.y]) {
+//            availability[position.x][position.y] = false;
+//            return true;    //to let other method know it succeeded
+//        }
+//        return false;       //as above, but did not succeed
+//    }
+//
+//    public Animal createAnimal() {
+//        if (isFree(new Vector2d(2, 2))) {
+//            return new Animal();
+//        }
+//        return null;
+//    }
+//
+// w metodzie 'move' klasy 'Animal' w 48 linijce tuż przed zmianą pozycji wywołuję metodę 'setOccupation' i jeśli zwróci ona 'true' to aktualizuję pozycję obiektu Animal
+//
+// koniec propozycji
+//  ----------------------------------------------------------------------------------
     public static void run(Direction[] args) {
 
         for (int i = 0; i < args.length; i++) {
@@ -20,50 +50,25 @@ public class World {
                 case RIGHT:
                     out.println("Zwierzak skręca w prawo");
                     break;
-                case UNKNOWN:
-                    out.println("Zwierzak nie wie co robić");
-                    break;
+//                case UNKNOWN:
+//                    out.println("Zwierzak nie wie co robić");
+//                    break;
             }
         }
     }
-    enum MoveDirection {
-        FORWARD,
-        BACKWARD,
-        RIGHT,
-        LEFT
-    }
+
 
     public static void main(String[] args) {
 
-        Vector2d position1 = new Vector2d(1,2);
-        System.out.println(position1);
-        Vector2d position2 = new Vector2d(-2,1);
-        System.out.println(position2);
-        System.out.println(position1.add(position2));
+        Animal animal = new Animal();
+        OptionsParser parser = new OptionsParser();
+        MoveDirection[] instructions = parser.parse(args);
+        out.println(animal.toString());
 
-
-        MapDirection dir = MapDirection.WEST;
-
-        out.println(dir.toString());
-        out.println(dir.next());
-        out.println(dir.previous());
-        out.println(dir.toUnitVector());
-
-//        Direction[] dirs = new Direction[args.length];
-//
-//        for(int i = 0; i < args.length; i++) {
-//            dirs[i] = switch (args[i]) {
-//                case "f" -> Direction.FORWARD;
-//                case "b" -> Direction.BACKWARD;
-//                case "l" -> Direction.LEFT;
-//                case "r" -> Direction.RIGHT;
-//                default -> Direction.UNKNOWN;
-//            };
-//        }
-
-//        out.println("Start");
-//        run(dirs);
-//        out.println("Stop");
+        for (MoveDirection instr: instructions) {
+            animal.move(instr);
+            out.println(animal.toString());
+        }
 
     }
 }
