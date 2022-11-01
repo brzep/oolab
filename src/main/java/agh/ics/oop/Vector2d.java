@@ -11,7 +11,6 @@ public class Vector2d {
     }
 
     public String toString() {
-//            return "(" + String.ValueOf(x) + ", " + String.ValueOf(y) + ")";
         return "(" + Integer.toString(x) + ", " + Integer.toString(y) + ")";
     }
 

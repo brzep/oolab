@@ -1,18 +1,23 @@
 package agh.ics.oop;
 
 public class Animal {
-    private MapDirection orientation = MapDirection.NORTH;
-    private Vector2d position = new Vector2d(2, 2);
+    public MapDirection orientation = MapDirection.NORTH;
+    public Vector2d position;
 
-    private Vector2d upperRightBound = new Vector2d(4, 4);
-    private Vector2d lowerLeftBound = new Vector2d(0, 0);
+    private final IWorldMap map;
 
-    public String toString() {
-        return "pozycja zwierzaka " + this.position.toString() + ", orientacja zwierzaka: " + this.orientation.toString();
+    public Animal(IWorldMap map, Vector2d initialPosition) {
+        this.position = initialPosition;
+        this.map = map;
     }
 
-    public boolean isAt(Vector2d pos) {
-        return this.position.equals(pos);
+    public String toString() {
+        return switch (this.orientation) {
+            case WEST -> "W";
+            case NORTH -> "N";
+            case EAST -> "E";
+            case SOUTH -> "S";
+        };
     }
 
     public void move(MoveDirection direction) {
@@ -45,8 +50,11 @@ public class Animal {
                 break;
         }
 
-        if (tmpPosition.precedes(upperRightBound) && tmpPosition.follows(lowerLeftBound)) //w przypadku kontroli zajętości pól dodaję do warunku "&& World.setOccupation(tmpPosition)"
-            this.position = tmpPosition;
+        if (tmpPosition != position && map.canMoveTo(tmpPosition)) {
+            map.relocate(position, tmpPosition);
+            position = tmpPosition;
+        }
+
     }
 
 }
