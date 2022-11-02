@@ -4,8 +4,14 @@ public class Animal {
     public MapDirection orientation = MapDirection.NORTH;
     public Vector2d position;
 
-    private final IWorldMap map;
+    private IWorldMap map;
 
+    public Animal() {
+        this.position = new Vector2d(2,2);
+    }
+    public Animal(IWorldMap map) {
+        this.map = map;
+    }
     public Animal(IWorldMap map, Vector2d initialPosition) {
         this.position = initialPosition;
         this.map = map;
