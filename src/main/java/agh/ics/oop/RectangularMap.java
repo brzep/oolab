@@ -1,33 +1,14 @@
 package agh.ics.oop;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class RectangularMap implements IWorldMap {
-
-    private final Vector2d lowerLeft;
-    private final Vector2d upperRight;
-
-    ArrayList<ArrayList<Object>> map = new ArrayList<ArrayList<Object>>();
+public class RectangularMap extends AbstractWorldMap {
 
     public RectangularMap(int width, int height) {
         this.lowerLeft = new Vector2d(0, 0);            //ograniczenia nie były dokładniej opisane, więc ustalam je w taki sposób
         this.upperRight = new Vector2d(width - 1, height - 1);
-        for (int i = 0; i < width; i++) {
-            map.add(new ArrayList<Object>());
-            for (int j = 0; j < height; j++) {
-                map.get(i).add(null);
-            }
-        }
-    }
-
-    public String toString() {
-        MapVisualizer visualizer = new MapVisualizer(this);
-//        return map.toString();
-        return visualizer.draw(lowerLeft, upperRight);
-    }
-
-    private boolean isInBounds(Vector2d position) {
-        return (position.precedes(upperRight) && position.follows(lowerLeft));
     }
 
     public boolean canMoveTo(Vector2d position) {
@@ -36,7 +17,7 @@ public class RectangularMap implements IWorldMap {
 
     public boolean place(Animal animal) {
         if (!this.isOccupied(animal.position) && isInBounds(animal.position)) {
-            map.get(animal.position.x).set(animal.position.y, animal);
+            elements.add(animal);
             return true;
         } else {
             return false;
@@ -45,18 +26,28 @@ public class RectangularMap implements IWorldMap {
 
     public boolean isOccupied(Vector2d position) {
         if (!isInBounds(position))
-                return true;
-        return !(map.get(position.x).get(position.y) == null);
-    }
-
-
-    public Object objectAt(Vector2d position) {
-        return map.get(position.x).get(position.y);
+            return true;
+        return !isFreeAnimal(position);
     }
 
     public void relocate(Vector2d curr, Vector2d target) {
-        map.get(target.x).set(target.y, objectAt(curr));
-        map.get(curr.x).set(curr.y, null);
+        Iterator<IMapElement> it = elements.iterator();
+        IMapElement tmp = null;
+        while (it.hasNext()) {
+            tmp = it.next();
+            if (tmp.getPosition().equals(curr)) {
+                it.remove();
+                break;
+            }
+        }
+        if (tmp == null)
+            return;
+        tmp.setPosition(target);
+        elements.add(tmp);
+    }
+
+    private boolean isInBounds(Vector2d position) {
+        return (position.precedes(upperRight) && position.follows(lowerLeft));
     }
 
 }

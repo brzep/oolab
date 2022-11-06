@@ -5,7 +5,6 @@ enum MapDirection {
     SOUTH,
     EAST,
     WEST;
-//    UNKNOWN;
 
     public String toString(){
         switch(this) {
@@ -28,7 +27,6 @@ enum MapDirection {
             case WEST:
                 return NORTH;
         }
-//        return UNKNOWN;
         return null;
     }
 
@@ -43,7 +41,6 @@ enum MapDirection {
             case WEST:
                 return SOUTH;
         }
-//        return UNKNOWN;
         return null;
     }
 
