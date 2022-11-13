@@ -17,7 +17,7 @@ public class RectangularMap extends AbstractWorldMap {
 
     public boolean place(Animal animal) {
         if (!this.isOccupied(animal.position) && isInBounds(animal.position)) {
-            elements.add(animal);
+            elements.put(animal.position, animal);
             return true;
         } else {
             return false;
@@ -28,22 +28,6 @@ public class RectangularMap extends AbstractWorldMap {
         if (!isInBounds(position))
             return true;
         return !isFreeAnimal(position);
-    }
-
-    public void relocate(Vector2d curr, Vector2d target) {
-        Iterator<IMapElement> it = elements.iterator();
-        IMapElement tmp = null;
-        while (it.hasNext()) {
-            tmp = it.next();
-            if (tmp.getPosition().equals(curr)) {
-                it.remove();
-                break;
-            }
-        }
-        if (tmp == null)
-            return;
-        tmp.setPosition(target);
-        elements.add(tmp);
     }
 
     private boolean isInBounds(Vector2d position) {

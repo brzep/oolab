@@ -13,17 +13,18 @@ class GrassFieldTest {
         Animal[] animals = new Animal[positions.length];
         for (int i = 0; i < positions.length; i++) {
             animals[i] = new Animal(map, positions[i]);
+            animals[i].addObserver(map);
             map.place(animals[i]);
         }
         for (int i = 0; i < moves.length; i++) {
             animals[i % animals.length].move(moves[i]);
         }
-
+        System.out.println(map);
         assertEquals(animals[0], map.objectAt(new Vector2d(2, 5)));
         assertEquals(MapDirection.NORTH, animals[0].orientation);
         assertEquals(animals[1], map.objectAt(new Vector2d(3, 3)));
         assertEquals(MapDirection.NORTH, animals[1].orientation);
-        assertEquals(map.elements.size(), 3);
+        assertEquals(3, map.elements.size());
     }
 
     @Test
@@ -34,6 +35,7 @@ class GrassFieldTest {
         Animal[] animals = new Animal[positions.length];
         for (int i = 0; i < positions.length; i++) {
             animals[i] = new Animal(map, positions[i]);
+            animals[i].addObserver(map);
             map.place(animals[i]);
         }
         for (int i = 0; i < moves.length; i++) {
@@ -55,12 +57,12 @@ class GrassFieldTest {
         Animal[] animals = new Animal[positions.length];
         for (int i = 0; i < positions.length; i++) {
             animals[i] = new Animal(map, positions[i]);
+            animals[i].addObserver(map);
             map.place(animals[i]);
         }
         for (int i = 0; i < moves.length; i++) {
             animals[i % animals.length].move(moves[i]);
         }
-        System.out.println(map);
         assertEquals(animals[0], map.objectAt(new Vector2d(2, 0)));
         assertEquals(MapDirection.NORTH, animals[0].orientation);
         assertEquals(animals[1], map.objectAt(new Vector2d(0, 3)));

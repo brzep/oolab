@@ -47,5 +47,5 @@ public interface IWorldMap {
     Object objectAt(Vector2d position);
 
 
-    void relocate(Vector2d curr, Vector2d target);
+//    void relocate(Vector2d curr, Vector2d target);
 }

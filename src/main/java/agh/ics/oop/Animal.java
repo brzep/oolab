@@ -1,9 +1,12 @@
 package agh.ics.oop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Animal extends AbstractWorldMapElement {
     public MapDirection orientation = MapDirection.NORTH;
-
     private IWorldMap map;
+    List<IPositionChangeObserver> observerList = new ArrayList<>();
 
     public Animal() {
         this.position = new Vector2d(2,2);
@@ -26,7 +29,7 @@ public class Animal extends AbstractWorldMapElement {
     }
 
     public void move(MoveDirection direction) {
-        Vector2d tmpPosition = this.position;
+        Vector2d newPosition = this.position;
         switch (direction) {
             case RIGHT:
                 this.orientation = this.orientation.next();
@@ -37,7 +40,7 @@ public class Animal extends AbstractWorldMapElement {
                 break;
 
             case FORWARD:
-                tmpPosition = tmpPosition.add(switch (this.orientation) {
+                newPosition = newPosition.add(switch (this.orientation) {
                     case NORTH -> new Vector2d(0, 1);
                     case EAST -> new Vector2d(1, 0);
                     case SOUTH -> new Vector2d(0, -1);
@@ -46,7 +49,7 @@ public class Animal extends AbstractWorldMapElement {
                 break;
 
             case BACKWARD:
-                tmpPosition = tmpPosition.add(switch (this.orientation) {
+                newPosition = newPosition.add(switch (this.orientation) {
                     case NORTH -> new Vector2d(0, -1);
                     case EAST -> new Vector2d(-1, 0);
                     case SOUTH -> new Vector2d(0, 1);
@@ -55,11 +58,25 @@ public class Animal extends AbstractWorldMapElement {
                 break;
         }
 
-        if (tmpPosition != position && map.canMoveTo(tmpPosition)) {
-            map.relocate(position, tmpPosition);
-            position = tmpPosition;
+        if (newPosition != position && map.canMoveTo(newPosition)) {
+            positionChanged(position, newPosition);
+            position = newPosition;
+//            map.relocate(position, newPosition);
         }
 
+    }
+
+    void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        for (IPositionChangeObserver observer : observerList) {
+            observer.positionChanged(oldPosition, newPosition);
+        }
+    }
+    void addObserver(IPositionChangeObserver observer) {
+        observerList.add(observer);
+    }
+
+    void removeObserver(IPositionChangeObserver observer) {
+        observerList.remove(observer);
     }
 
 }

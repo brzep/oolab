@@ -4,20 +4,19 @@ import java.util.*;
 
 public class GrassField extends AbstractWorldMap {
 
-    private final int minBound;
+    private final int minBound;     //ensures that map is not smaller than sqrt(10*fieldsQuantity)
 
     public GrassField(int fieldsQuantity) {
         lowerLeft = new Vector2d(0, 0);
-        Random randGenerator = new Random();
         this.minBound = (int) Math.floor(Math.sqrt(fieldsQuantity * 10));
         upperRight = new Vector2d(minBound, minBound);
+
+        Random randGenerator = new Random();
         for (int i = 0; i < fieldsQuantity; i++) {
             Vector2d pos = new Vector2d(randGenerator.nextInt(minBound), randGenerator.nextInt(minBound));
-            while (!isFreeGrass(pos))
+            while (!isFreeGrass(pos))   //finding position with no grass on it
                 pos = new Vector2d(randGenerator.nextInt(minBound), randGenerator.nextInt(minBound));
-            if (pos.follows(upperRight))
-                upperRight = pos;
-            elements.add(new Grass(pos));
+            elements.put(pos, new Grass(pos));
         }
     }
 
@@ -26,14 +25,17 @@ public class GrassField extends AbstractWorldMap {
     }
 
     public boolean place(Animal animal) {
-        if (this.isFreeAnimal(animal.getPosition())) {
-            elements.add(animal);
-            grassReplacement(animal.getPosition());
-            if (animal.position.follows(upperRight))
-                upperRight = animal.getPosition();
-            return true;
+        if (this.isFreeAnimal(animal.getPosition())) {  //an animal can be placed on certain position if there are no other animals
+            if (elements.get(animal.getPosition()) == null) {   //if there's nothing on that position
+                 elements.put(animal.getPosition(), animal);
+            } else {    //there's already grass on that position
+                addGrass();     //animal eats it, so we need to add new grass to map
+                elements.replace(animal.getPosition(), animal);     //and animal is placed on desired position
+            }
+            updateBound(animal.getPosition());   //updating upperRight map bound
+            return true;    //everything went fine
         } else {
-            return false;
+            return false;   //animal couldn't be placed
         }
     }
 
@@ -41,76 +43,53 @@ public class GrassField extends AbstractWorldMap {
         return !(this.isFreeAnimal(position) && this.isFreeGrass(position) && position.follows(lowerLeft));
     }
 
-    public void relocate(Vector2d curr, Vector2d target) {
-        Iterator<IMapElement> it = elements.iterator();
-        IMapElement tmp = null;
-        while (it.hasNext()) {
-            tmp = it.next();
-            if (tmp.getPosition().equals(curr)) {
-                it.remove();
-                updateBound();
-                break;
-            }
-        }
-        if (tmp == null)
-            return;
+    public void relocate(Vector2d previous, Vector2d target) {
+        IMapElement tmp = elements.remove(previous);
         tmp.setPosition(target);
-        elements.add(tmp);
-        updateBound();
-        grassReplacement(target);
+        if (elements.get(target) == null) {
+            elements.put(target, tmp);
+        } else {
+            elements.replace(target, tmp);
+            addGrass();
+        }
+        updateBoundAll();   //we need to check all elements, because previous could be the bound and now it is removed
     }
 
     @Override
-    public Object objectAt(Vector2d position) {
-        Iterator<IMapElement> it = elements.iterator();
-        while (it.hasNext()) {
-            IMapElement tmp = it.next();
-            if (tmp.getPosition().equals((position))) {
-                return tmp;
-            }
-        }
-        return null;
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        if (elements.get(newPosition) != null) {
+            addGrass();
+            elements.replace(newPosition, elements.remove(oldPosition));
+        } else
+            elements.put(newPosition, elements.remove(oldPosition));
     }
 
-    private void updateBound() {
+    private void updateBound(Vector2d position) {
+        upperRight = new Vector2d(Math.max(upperRight.x, position.x), Math.max(upperRight.y, position.y));
+    }
+
+    private void updateBoundAll() {
         Vector2d max = new Vector2d(minBound, minBound);
-        for (IMapElement element : elements) {
-            max = new Vector2d(Math.max(max.x, element.getPosition().x), Math.max(max.y, element.getPosition().y));
+        for (Vector2d element : elements.keySet()) {
+            max = new Vector2d(Math.max(max.x, element.x), Math.max(max.y, element.y));
         }
         upperRight = max;
     }
 
     private boolean isFreeGrass(Vector2d position) {
-        Iterator<IMapElement> it = elements.iterator();
-        IMapElement tmp;
-        while (it.hasNext()) {
-            tmp = it.next();
-            if (tmp.getPosition().equals(position) && tmp.getClass() == Grass.class)
-                return false;
-        }
-        return true;
+        IMapElement tmp = elements.get(position);
+        if (tmp == null)
+            return true;
+        return !(tmp.getClass() == Grass.class);
     }
 
-    private void grassReplacement(Vector2d position) {  //spawn new Grass object if there is already one on "position"
-        Iterator<IMapElement> it = elements.iterator();
-        IMapElement tmp;
-        boolean found = false;
-        while (it.hasNext()) {
-            tmp = it.next();
-            if (tmp.getPosition().equals(position) && tmp.getClass() == Grass.class) {
-                it.remove();
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-            return;
+    private void addGrass() {  //spawn new Grass object from
         Random randGenerator = new Random();
         Vector2d pos = new Vector2d(randGenerator.nextInt(minBound), randGenerator.nextInt(minBound));
-        while (isOccupied(pos)) {   //mam swiadomosc, ze ten while moze potencjalnie dzialac w nieskonczosc, wymaga to poprawy, jednak niestety nie mialem juz na to czasu
+        while (isOccupied(pos)) {
             pos = new Vector2d(randGenerator.nextInt(minBound), randGenerator.nextInt(minBound));
         }
-        elements.add(new Grass(pos));
+        elements.put(pos, new Grass(pos));
 
     }
 

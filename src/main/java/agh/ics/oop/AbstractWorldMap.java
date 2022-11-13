@@ -1,12 +1,11 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-abstract class AbstractWorldMap implements IWorldMap {
+abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
-    protected List<IMapElement> elements = new ArrayList<>();
+//    protected List<IMapElement> elements = new ArrayList<>();
+    Map<Vector2d, IMapElement> elements = new HashMap<>();
     protected Vector2d lowerLeft;
     protected Vector2d upperRight;
 
@@ -16,24 +15,18 @@ abstract class AbstractWorldMap implements IWorldMap {
     }
 
     protected boolean isFreeAnimal(Vector2d position) {
-        Iterator<IMapElement> it = elements.iterator();
-        IMapElement tmp;
-        while (it.hasNext()) {
-            tmp = it.next();
-            if (tmp.getPosition().equals(position) && tmp.getClass() == Animal.class)
-                return false;
-        }
-        return true;
+        IMapElement tmp = elements.get(position);
+        if (tmp == null)
+            return true;
+        return !(tmp.getClass() == Animal.class);
     }
 
     public Object objectAt(Vector2d position) {
-        Iterator<IMapElement> it = elements.iterator();
-        while (it.hasNext()) {
-            IMapElement tmp = it.next();
-            if (tmp.getPosition().equals((position))) {
-                return tmp;
-            }
-        }
-        return null;
+        return elements.get(position);
+    }
+
+
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        elements.put(newPosition, elements.remove(oldPosition));
     }
 }
