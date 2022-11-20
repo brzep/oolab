@@ -2,12 +2,12 @@ package agh.ics.oop;
 
 import java.util.*;
 
-abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
 //    protected List<IMapElement> elements = new ArrayList<>();
     Map<Vector2d, IMapElement> elements = new HashMap<>();
-    protected Vector2d lowerLeft;
-    protected Vector2d upperRight;
+    public Vector2d lowerLeft;
+    public Vector2d upperRight;
 
     public String toString() {
         MapVisualizer visualizer = new MapVisualizer(this);

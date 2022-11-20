@@ -15,12 +15,11 @@ public class RectangularMap extends AbstractWorldMap {
         return (!isOccupied(position) && isInBounds(position));
     }
 
-    public boolean place(Animal animal) {
+    public void place(Animal animal) {
         if (!this.isOccupied(animal.position) && isInBounds(animal.position)) {
             elements.put(animal.position, animal);
-            return true;
         } else {
-            return false;
+            throw new IllegalArgumentException("sorry, position " + animal.getPosition() + "is already occupied by another animal");
         }
     }
 

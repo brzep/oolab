@@ -12,8 +12,13 @@ public class Vector2d {
         this.y = y;
     }
 
+    public Vector2d(int n) {
+        x = n;
+        y = n;
+    }
+
     public String toString() {
-        return "(" + Integer.toString(x) + ", " + Integer.toString(y) + ")";
+        return "(" + x + ", " + y + ")";
     }
 
     public boolean precedes(Vector2d other) {
@@ -61,6 +66,33 @@ public class Vector2d {
         return false;
     }
 
+    public int compareX(Vector2d b) {
+        if (this.x > b.x)
+            return 1;
+        else if (this.x == b.x)
+            if (this.y > b.y)
+                return 1;
+            else if (this.y == b.y)
+                return 0;
+            else
+                return -1;
+        else
+            return -1;
+    }
+
+    public int compareY(Vector2d b) {
+        if (this.y > b.y)
+            return 1;
+        else if (this.y == b.y)
+            if (this.x > b.x)
+                return 1;
+            else if (this.x == b.x)
+                return 0;
+            else
+                return -1;
+        else
+            return -1;
+    }
     @Override
     public int hashCode() {
         return Objects.hash(x, y);

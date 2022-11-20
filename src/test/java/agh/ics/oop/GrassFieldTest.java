@@ -19,7 +19,6 @@ class GrassFieldTest {
         for (int i = 0; i < moves.length; i++) {
             animals[i % animals.length].move(moves[i]);
         }
-        System.out.println(map);
         assertEquals(animals[0], map.objectAt(new Vector2d(2, 5)));
         assertEquals(MapDirection.NORTH, animals[0].orientation);
         assertEquals(animals[1], map.objectAt(new Vector2d(3, 3)));
@@ -68,5 +67,20 @@ class GrassFieldTest {
         assertEquals(animals[1], map.objectAt(new Vector2d(0, 3)));
         assertEquals(MapDirection.WEST, animals[1].orientation);
         assertEquals(5, map.elements.size());
+    }
+
+    @Test
+    void testPlace() {
+        GrassField map = new GrassField(3);
+        Vector2d[] positions = {new Vector2d(2, 2), new Vector2d(2, 2)};
+        Animal[] animals = new Animal[positions.length];
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            for (int i = 0; i < positions.length; i++) {
+                animals[i] = new Animal(map, positions[i]);
+                map.place(animals[i]);
+            }
+        });
+        assertEquals("sorry, position (2, 2) is already occupied by another animal", exception.getMessage());
+
     }
 }

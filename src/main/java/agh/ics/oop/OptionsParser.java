@@ -28,6 +28,8 @@ public class OptionsParser {
                     results[i] = MoveDirection.RIGHT;
                     i++;
                     break;
+                default:
+                    throw new IllegalArgumentException(s + " is not legal move specification");
             };
         }
         System.arraycopy(results, 0, results, 0, i);
