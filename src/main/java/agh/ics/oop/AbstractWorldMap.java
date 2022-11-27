@@ -3,8 +3,6 @@ package agh.ics.oop;
 import java.util.*;
 
 public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
-
-//    protected List<IMapElement> elements = new ArrayList<>();
     Map<Vector2d, IMapElement> elements = new HashMap<>();
     public Vector2d lowerLeft;
     public Vector2d upperRight;

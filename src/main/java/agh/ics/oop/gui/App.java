@@ -2,33 +2,30 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.io.FileNotFoundException;
 
 import static java.lang.System.out;
 
-public class App extends Application {
+public class App extends Application implements IPositionChangeObserver {
+    GridPane grid = new GridPane();
+    AbstractWorldMap map;
+    SimulationEngine engine;
+    Stage primaryStage;
+    int cellSize = 40;
 
-
-
-    public void start(Stage primaryStage) {
-        MoveDirection[] directions = new OptionsParser().parse(getParameters().getRaw().toArray(new String[0]));
-        AbstractWorldMap map = new GrassField(10);
-        Vector2d[] positions = {new Vector2d(41, 2), new Vector2d(3, 17), new Vector2d(0, 0)};
-        IEngine engine = new SimulationEngine(directions, map, positions);
-        engine.run();
-        out.println(map);
-
-
-        GridPane grid = new GridPane();
+    private void renderMap(AbstractWorldMap map) throws FileNotFoundException {
+        grid = new GridPane();
         grid.setGridLinesVisible(true);
-        int cellSize = 25;
 
         Label topLeft = new Label("y\\x");
         grid.add(topLeft, 0, 0);
@@ -55,17 +52,53 @@ public class App extends Application {
         for (int i = 0; i <= map.upperRight.x; i++) {
             for (int j = 0; j <= map.upperRight.y; j++) {
                 if (map.isOccupied(new Vector2d(i, map.upperRight.y - j))) {
-                    Label lbl = new Label(map.objectAt(new Vector2d(i, map.upperRight.y - j)).toString());
-                    grid.add(lbl, i + 1, j + 1);
-                    GridPane.setHalignment(lbl, HPos.CENTER);
-                    GridPane.setValignment(lbl, VPos.CENTER);
+                    VBox box = new GuiElementBox((IMapElement) map.objectAt(new Vector2d(i, map.upperRight.y - j))).getVbox();
+                    grid.add(box, i + 1, j + 1);
+                    GridPane.setHalignment(box, HPos.CENTER);
+                    GridPane.setValignment(box, VPos.CENTER);
                 }
             }
         }
-        Scene scene = new Scene(grid, cellSize * (map.upperRight.x + 2), cellSize * (map.upperRight.y + 2));
+        Button button = new Button("go");
+        TextField textField = new TextField();
+        HBox hbox = new HBox(textField, button);
+        VBox vbox = new VBox(grid, hbox);
+        Scene scene = new Scene(vbox);
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        button.setOnAction(actionEvent -> {
+            OptionsParser parser = new OptionsParser();
+            engine.setDirections(parser.parse(textField.getText().split(" ")));
+            Thread thread = new Thread(engine);
+            thread.start();
+        });
+    }
+
+
+    @Override
+    public void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+        Platform.runLater(() -> {
+            try {
+                renderMap(map);
+            } catch (FileNotFoundException ex) {
+                out.println(ex.getMessage());
+                System.exit(1);
+            }
+        });
+
+    }
+
+    public void start(Stage primaryStage) throws FileNotFoundException {
+        this.primaryStage = primaryStage;
+        renderMap(map);
+    }
+
+    public void init() {
+        MoveDirection[] directions = new OptionsParser().parse(getParameters().getRaw().toArray(new String[0]));
+        this.map = new GrassField(10);
+        Vector2d[] positions = {new Vector2d(21, 2), new Vector2d(3, 17), new Vector2d(0, 0)};
+        engine = new SimulationEngine(directions, map, positions, this, 300);
     }
 
 }

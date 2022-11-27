@@ -35,6 +35,7 @@ public class GrassField extends AbstractWorldMap {
                 elements.replace(animal.getPosition(), animal);     //and animal is placed on desired position
             }
             boundary.add(animal);
+            upperRight = boundary.getBound();
         } else {
             throw new IllegalArgumentException("sorry, position " + animal.getPosition() + " is already occupied by another animal");
         }

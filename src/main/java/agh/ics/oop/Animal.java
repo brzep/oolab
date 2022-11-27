@@ -28,6 +28,15 @@ public class Animal extends AbstractWorldMapElement {
         };
     }
 
+    public String toPath() {
+        return switch(this.orientation) {
+            case NORTH -> "./src/main/resources/up.png";
+            case SOUTH -> "./src/main/resources/down.png";
+            case EAST -> "./src/main/resources/right.png";
+            case WEST -> "./src/main/resources/left.png";
+        };
+    }
+
     public void move(MoveDirection direction) {
         Vector2d newPosition = this.position;
         switch (direction) {
@@ -61,7 +70,6 @@ public class Animal extends AbstractWorldMapElement {
         if (newPosition != position && map.canMoveTo(newPosition)) {
             positionChanged(position, newPosition);
             position = newPosition;
-//            map.relocate(position, newPosition);
         }
 
     }
@@ -77,6 +85,16 @@ public class Animal extends AbstractWorldMapElement {
 
     void removeObserver(IPositionChangeObserver observer) {
         observerList.remove(observer);
+    }
+
+    @Override
+    public String getTexturePath() {
+        return switch (this.orientation) {
+            case WEST -> "resources/right.png";
+            case NORTH -> "resources/up.png";
+            case EAST -> "resources/left.png";
+            case SOUTH -> "resources/down.png";
+        };
     }
 
 }
